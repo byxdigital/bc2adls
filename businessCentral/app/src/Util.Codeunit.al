@@ -419,6 +419,8 @@ codeunit 82564 "ADLSE Util"
         if IsTablePerCompany(RecordRef.Number()) then
             Payload.Append(StrSubstNo(CommaPrefixedTok, ADLSECDMUtil.GetCompanyFieldName()));
 
+        Payload.Append(StrSubstNo(CommaPrefixedTok, ADLSECDMUtil.GetEnvironmentFieldName()));
+
         if (RecordRef.Number() = Database::"G/L Entry") and (ADLSESetup."Export Closing Date column") then
             Payload.Append(StrSubstNo(CommaPrefixedTok, ADLSECDMUtil.GetClosingDateFieldName()));
 
@@ -465,6 +467,8 @@ codeunit 82564 "ADLSE Util"
         if IsTablePerCompany(RecordRef.Number()) then
             Payload.Append(StrSubstNo(CommaPrefixedTok, ConvertStringToText(CompanyName())));
 
+        Payload.Append(StrSubstNo(CommaPrefixedTok, ConvertStringToText(EnvironmentName())));
+
         if (RecordRef.Number() = Database::"G/L Entry") and (ADLSESetup."Export Closing Date column") then begin
             //Field 4 is Posting Date
             FieldRef := RecordRef.Field(4);
@@ -492,6 +496,13 @@ codeunit 82564 "ADLSE Util"
         Payload.AppendLine();
 
         RecordPayload := Payload.ToText();
+    end;
+
+    procedure EnvironmentName(): Text
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        exit(EnvironmentInformation.GetEnvironmentName());
     end;
 
     procedure IsTablePerCompany(TableID: Integer): Boolean

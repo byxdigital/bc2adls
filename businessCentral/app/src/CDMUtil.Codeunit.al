@@ -14,6 +14,7 @@ codeunit 82566 "ADLSE CDM Util" // Refer Common Data Model https://docs.microsof
         CompanyFieldNameLbl: Label '$Company', Locked = true;
         DeliveredDateTimeFieldNameLbl: Label '$DeliveredDateTime', Locked = true;
         ClosingDateFieldNameLbl: Label '$ClosingDate', Locked = true;
+        EnvironmentFieldNameLbl: Label '$Environment';
         ExistingFieldCannotBeRemovedErr: Label 'The field %1 in the entity %2 is already present in the data lake and cannot be removed.', Comment = '%1: field name, %2: entity name';
         FieldDataTypeCannotBeChangedErr: Label 'The data type for the field %1 in the entity %2 cannot be changed.', Comment = '%1: field name, %2: entity name';
         RepresentsTableTxt: Label 'Represents the table %1', Comment = '%1: table caption';
@@ -73,6 +74,7 @@ codeunit 82566 "ADLSE CDM Util" // Refer Common Data Model https://docs.microsof
         Imports.Add(ADLSEUtil.GetDataLakeCompliantFieldName(SystemIdFieldRef));
         if ADLSEUtil.IsTablePerCompany(TableID) then
             Imports.Add(this.GetCompanyFieldName());
+        Imports.Add(this.GetEnvironmentFieldName());
         Content.Add('keyColumns', Imports);
         Content.Add('fileDetectionStrategy', 'LastUpdateTimeFileDetection');
 
@@ -224,6 +226,10 @@ codeunit 82566 "ADLSE CDM Util" // Refer Common Data Model https://docs.microsof
                 CreateAttributeJson(GetCompanyFieldName(), DataFormat, GetCompanyFieldName(), AppliedTraits, GetCompanyFieldNameLength(), false));
         end;
 
+        GetCDMAttributeDetails(FieldType::Text, DataFormat, AppliedTraits);
+        Result.Add(
+            CreateAttributeJson(GetEnvironmentFieldName(), DataFormat, GetEnvironmentFieldName(), AppliedTraits, GetEnvironmentFieldNameLength(), false));
+
         if (RecordRef.Number() = Database::"G/L Entry") and (ADLSESetup."Export Closing Date column") then begin
             GetCDMAttributeDetails(FieldType::Boolean, DataFormat, AppliedTraits);
             Result.Add(
@@ -235,6 +241,7 @@ codeunit 82566 "ADLSE CDM Util" // Refer Common Data Model https://docs.microsof
             Result.Add(
                 CreateAttributeJson(GetDeliveredDateTimeFieldName(), DataFormat, GetDeliveredDateTimeFieldName(), AppliedTraits, FieldRef.Length(), false));
         end;
+
     end;
 
     procedure GetCompanyFieldName(): Text
@@ -247,6 +254,16 @@ codeunit 82566 "ADLSE CDM Util" // Refer Common Data Model https://docs.microsof
         Company: Record Company;
     begin
         exit(MaxStrLen(Company.Name)); // see https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/methods-auto/database/database-copycompany-method
+    end;
+
+    procedure GetEnvironmentFieldName(): Text
+    begin
+        exit(EnvironmentFieldNameLbl);
+    end;
+
+    procedure GetEnvironmentFieldNameLength(): Integer
+    begin
+        exit(30); // When creating new environments from Admin Center, environment names cannot be longer than 30 characters.
     end;
 
     procedure GetDeliveredDateTimeFieldName(): Text

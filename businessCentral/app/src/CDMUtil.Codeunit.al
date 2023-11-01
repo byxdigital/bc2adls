@@ -7,6 +7,7 @@ codeunit 82566 "ADLSE CDM Util" // Refer Common Data Model https://docs.microsof
     var
         BlankArray: JsonArray;
         CompanyFieldNameLbl: Label '$Company';
+        EnvironmentFieldNameLbl: Label '$Environment'; //lagt til av Thomas
         ExistingFieldCannotBeRemovedErr: Label 'The field %1 in the entity %2 is already present in the data lake and cannot be removed.', Comment = '%1: field name, %2: entity name';
         FieldDataTypeCannotBeChangedErr: Label 'The data type for the field %1 in the entity %2 cannot be changed.', Comment = '%1: field name, %2: entity name';
         RepresentsTableTxt: Label 'Represents the table %1', Comment = '%1: table caption';
@@ -136,6 +137,20 @@ codeunit 82566 "ADLSE CDM Util" // Refer Common Data Model https://docs.microsof
             Result.Add(
                 CreateAttributeJson(GetCompanyFieldName(), DataFormat, GetCompanyFieldName(), AppliedTraits, FieldRef.Length));
         end;
+
+        GetCDMAttributeDetails(FieldType::Text, DataFormat, AppliedTraits);
+        Result.Add(
+            CreateAttributeJson(
+                GetEnvironmentFieldName(),
+                DataFormat,
+                GetEnvironmentFieldName(),
+                AppliedTraits,
+                FieldRef.Length));
+    end;
+
+    procedure GetEnvironmentFieldName(): Text //lagt til av Thomas
+    begin
+        exit(EnvironmentFieldNameLbl);
     end;
 
     procedure GetCompanyFieldName(): Text

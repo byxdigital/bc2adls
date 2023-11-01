@@ -333,8 +333,12 @@ codeunit 82564 "ADLSE Util"
         end;
         if IsTablePerCompany(RecordRef.Number) then
             Payload.Append(StrSubstNo(CommaPrefixedTok, ADLSECDMUtil.GetCompanyFieldName()));
+
+        Payload.Append(StrSubstNo(CommaPrefixedTok, ADLSECDMUtil.GetEnvironmentFieldName())); //lagt til av Thomas
+
         Payload.AppendLine();
         RecordPayload := Payload.ToText();
+
     end;
 
     procedure CreateCsvPayload(RecordRef: RecordRef; FieldIdList: List of [Integer]; AddHeaders: Boolean) RecordPayload: Text
@@ -361,9 +365,17 @@ codeunit 82564 "ADLSE Util"
         end;
         if IsTablePerCompany(RecordRef.Number) then
             Payload.Append(StrSubstNo(CommaPrefixedTok, ConvertStringToText(CompanyName())));
+        Payload.Append(StrSubstNo(CommaPrefixedTok, ConvertStringToText(EnvironmentName()))); //lagt til av Thomas
         Payload.AppendLine();
 
         RecordPayload := Payload.ToText();
+    end;
+
+    procedure EnvironmentName(): Text //lagt til av Thomas
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        exit(EnvironmentInformation.GetEnvironmentName());
     end;
 
     procedure IsTablePerCompany(TableID: Integer): Boolean

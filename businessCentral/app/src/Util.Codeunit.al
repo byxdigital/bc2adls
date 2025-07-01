@@ -344,8 +344,11 @@ codeunit 82564 "ADLSE Util"
         if ADLSESetup."Storage Type" = ADLSESetup."Storage Type"::"Open Mirroring" then
             Payload.Append(StrSubstNo(CommaPrefixedTok, RowMarkerTok));
 
+        Payload.Append(StrSubstNo(CommaPrefixedTok, ADLSECDMUtil.GetEnvironmentFieldName()));
+
         Payload.AppendLine();
         RecordPayload := Payload.ToText();
+
     end;
 
     procedure CreateCsvPayload(RecordRef: RecordRef; FieldIdList: List of [Integer]; AddHeaders: Boolean; Deletes: Boolean) RecordPayload: Text
@@ -382,6 +385,9 @@ codeunit 82564 "ADLSE Util"
         end;
         if IsTablePerCompany(RecordRef.Number) then
             Payload.Append(StrSubstNo(CommaPrefixedTok, ConvertStringToText(CompanyName())));
+
+        Payload.Append(StrSubstNo(CommaPrefixedTok, ConvertStringToText(EnvironmentName())));
+
         if ADLSESetup."Delivered DateTime" then
             Payload.Append(StrSubstNo(CommaPrefixedTok, ConvertDateTimeToText(CurrDateTime)));
 
@@ -408,6 +414,13 @@ codeunit 82564 "ADLSE Util"
         Payload.AppendLine();
 
         RecordPayload := Payload.ToText();
+    end;
+
+    procedure EnvironmentName(): Text
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        exit(EnvironmentInformation.GetEnvironmentName());
     end;
 
     procedure IsTablePerCompany(TableID: Integer): Boolean
